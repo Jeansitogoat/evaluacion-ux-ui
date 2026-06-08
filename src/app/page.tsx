@@ -1,5 +1,5 @@
-import KathInvite from "@/components/KathInvite";
+import EncuestaForm from "@/components/EncuestaForm";
 
 export default function Home() {
-  return <KathInvite />;
+  return <EncuestaForm />;
 }

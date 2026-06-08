@@ -17,14 +17,16 @@ const CAREER_OPTIONS = [
   "Derecho",
 ] as const;
 
-export default function KathInvite() {
+export default function EncuestaForm() {
   const [phase, setPhase] = useState<Phase>(1);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [career, setCareer] = useState("");
   const [usability, setUsability] = useState("");
   const [loadTime, setLoadTime] = useState("");
-  const [helpDev, setHelpDev] = useState("");
+  const [readability, setReadability] = useState("");
+  const [navigation, setNavigation] = useState("");
+  const [recommend, setRecommend] = useState("");
 
   const yesButtonRef = useRef<HTMLButtonElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
@@ -307,20 +309,62 @@ export default function KathInvite() {
 
             <div>
               <label
-                htmlFor="help-dev"
+                htmlFor="readability"
                 className="mb-1.5 block text-sm font-medium text-gray-700 sm:mb-2"
               >
-                3. ¿Qué tan dispuesta estarías a ayudar al desarrollador de esta
-                página en un problema crítico?
+                3. ¿El texto es fácil de leer?
               </label>
-              <textarea
-                id="help-dev"
-                rows={3}
-                value={helpDev}
-                onChange={(e) => setHelpDev(e.target.value)}
-                placeholder="Escribe tu respuesta aquí..."
-                className="w-full resize-none rounded border border-gray-300 px-3 py-2 text-base text-gray-700 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:rows-4"
-              />
+              <select
+                id="readability"
+                value={readability}
+                onChange={(e) => setReadability(e.target.value)}
+                className="w-full min-h-11 rounded border border-gray-300 bg-white px-3 py-2 text-base text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Seleccionar...</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+                <option value="regular">Regular</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="navigation"
+                className="mb-1.5 block text-sm font-medium text-gray-700 sm:mb-2"
+              >
+                4. ¿Sabes qué hacer en cada paso?
+              </label>
+              <select
+                id="navigation"
+                value={navigation}
+                onChange={(e) => setNavigation(e.target.value)}
+                className="w-full min-h-11 rounded border border-gray-300 bg-white px-3 py-2 text-base text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Seleccionar...</option>
+                <option value="si">Sí, todo claro</option>
+                <option value="masomenos">Más o menos</option>
+                <option value="no">No, me confundí</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="recommend"
+                className="mb-1.5 block text-sm font-medium text-gray-700 sm:mb-2"
+              >
+                5. ¿Recomendarías esta página a un compañero?
+              </label>
+              <select
+                id="recommend"
+                value={recommend}
+                onChange={(e) => setRecommend(e.target.value)}
+                className="w-full min-h-11 rounded border border-gray-300 bg-white px-3 py-2 text-base text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Seleccionar...</option>
+                <option value="si">Sí</option>
+                <option value="talvez">Tal vez</option>
+                <option value="no">No</option>
+              </select>
             </div>
 
             <button
@@ -356,7 +400,7 @@ export default function KathInvite() {
           <p>
             Ya fuera de bromas: creo que eres muy linda y me gustaría invitarte
             a cenar, o a hacer algo distinto para no quedarme solo con verte
-            cuando salimos a beber en grupo. ¿Qué dices, Kathy?
+            cuando salimos a beber en grupo. ¿Qué dices?
           </p>
         </div>
 
