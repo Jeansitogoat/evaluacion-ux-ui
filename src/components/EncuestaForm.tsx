@@ -1,7 +1,14 @@
 "use client";
 
 import confetti from "canvas-confetti";
-import { useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type PointerEvent,
+} from "react";
 
 type Phase = 1 | 2;
 
@@ -27,6 +34,84 @@ export default function EncuestaForm() {
   const [readability, setReadability] = useState("");
   const [navigation, setNavigation] = useState("");
   const [recommend, setRecommend] = useState("");
+
+  const yesButtonRef = useRef<HTMLButtonElement>(null);
+  const noButtonRef = useRef<HTMLButtonElement>(null);
+  const [noButtonPos, setNoButtonPos] = useState<{ x: number; y: number } | null>(
+    null
+  );
+  const [isNoButtonFloating, setIsNoButtonFloating] = useState(false);
+
+  const moveNoButton = useCallback(() => {
+    const button = noButtonRef.current;
+    if (!button) return;
+
+    const width = button.offsetWidth || 200;
+    const height = button.offsetHeight || 48;
+    const margin = 16;
+
+    const maxX = window.innerWidth - width - margin;
+    const maxY = window.innerHeight - height - margin;
+
+    if (maxX <= margin || maxY <= margin) return;
+
+    const yesRect = yesButtonRef.current?.getBoundingClientRect();
+    const buffer = 28;
+
+    let x = margin;
+    let y = margin;
+    let attempts = 0;
+
+    do {
+      x = margin + Math.random() * (maxX - margin);
+      y = margin + Math.random() * (maxY - margin);
+      attempts++;
+    } while (
+      yesRect &&
+      attempts < 15 &&
+      x < yesRect.right + buffer &&
+      x + width > yesRect.left - buffer &&
+      y < yesRect.bottom + buffer &&
+      y + height > yesRect.top - buffer
+    );
+
+    setIsNoButtonFloating(true);
+    setNoButtonPos({ x, y });
+  }, []);
+
+  useEffect(() => {
+    if (phase !== 2 || !isNoButtonFloating) return;
+
+    const handleNearTouch = (clientX: number, clientY: number) => {
+      const btn = noButtonRef.current;
+      if (!btn) return;
+
+      const rect = btn.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const distance = Math.hypot(clientX - centerX, clientY - centerY);
+
+      if (distance < 130) moveNoButton();
+    };
+
+    const onTouch = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (touch) handleNearTouch(touch.clientX, touch.clientY);
+    };
+
+    document.addEventListener("touchstart", onTouch, { passive: true });
+    document.addEventListener("touchmove", onTouch, { passive: true });
+
+    return () => {
+      document.removeEventListener("touchstart", onTouch);
+      document.removeEventListener("touchmove", onTouch);
+    };
+  }, [phase, isNoButtonFloating, moveNoButton]);
+
+  const handleNoButtonEscape = (e: PointerEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    moveNoButton();
+  };
 
   const handleYes = () => {
     const duration = 2500;
@@ -301,6 +386,7 @@ export default function EncuestaForm() {
 
         <div className="mx-auto mt-10 flex w-full max-w-md flex-col items-stretch gap-4 px-2">
           <button
+            ref={yesButtonRef}
             type="button"
             onClick={handleYes}
             className="w-full min-h-12 rounded-lg bg-green-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-green-500/25 transition-transform hover:scale-105 hover:bg-green-400 active:scale-95"
@@ -309,9 +395,27 @@ export default function EncuestaForm() {
           </button>
 
           <button
+            ref={noButtonRef}
             type="button"
+            onMouseEnter={moveNoButton}
+            onPointerDown={handleNoButtonEscape}
             onClick={(e) => e.preventDefault()}
-            className="w-full min-h-12 rounded-lg bg-red-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-red-600/25 transition-colors hover:bg-red-500 active:bg-red-700"
+            style={
+              isNoButtonFloating && noButtonPos
+                ? {
+                    position: "fixed",
+                    left: noButtonPos.x,
+                    top: noButtonPos.y,
+                    zIndex: 50,
+                    touchAction: "none",
+                  }
+                : undefined
+            }
+            className={`min-h-12 rounded-lg bg-red-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-red-600/25 select-none hover:bg-red-500 active:bg-red-700 ${
+              isNoButtonFloating
+                ? "w-auto max-w-[85vw] shrink-0 transition-[left,top] duration-300 ease-out"
+                : "w-full"
+            }`}
           >
             No, estoy ocupada
           </button>
