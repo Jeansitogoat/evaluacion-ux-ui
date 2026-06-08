@@ -1,7 +1,15 @@
 "use client";
 
 import confetti from "canvas-confetti";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type PointerEvent,
+} from "react";
 
 type Phase = 1 | 2;
 
@@ -128,7 +136,7 @@ export default function EncuestaForm() {
     };
   }, [phase, isMobileLayout, moveNoButton]);
 
-  const handleNoButtonEscape = (e: React.PointerEvent) => {
+  const handleNoButtonEscape = (e: PointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
     moveNoButton();
   };
@@ -171,7 +179,7 @@ export default function EncuestaForm() {
     }, 800);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPhase(2);
   };
